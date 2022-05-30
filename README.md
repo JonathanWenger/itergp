@@ -12,7 +12,9 @@ This repository contains an implementation of the framework described in the pap
 You can install the Python package via `pip`:
 
 ```bash
-pip install itergp
+git clone https://github.com/JonathanWenger/itergp
+cd itergp
+pip install -e .
 ```
 
 ## Documentation
@@ -36,7 +38,7 @@ Any datasets used in the experiments can be accessed via the API:
 ```python
 from itergp import datasets
 
-data = datasets.uci.BikeSharing(dir="experiments/data/uci")
+data = datasets.uci.BikeSharing(dir="data/uci")
 data.train.y
 # array([ 0.20011634, -2.74432264,  0.14604912, ...,  0.40556032,
 #         0.57590568, -0.54709806])
