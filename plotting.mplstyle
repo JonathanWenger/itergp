@@ -1,0 +1,69 @@
+#### MATPLOTLIBRC FORMAT
+
+## Matplotlib configuration file.
+##
+## Blank lines, or lines starting with a comment
+## symbol, are ignored, as are trailing comments.  Other lines must
+## have the format
+##     key : val # optional comment
+
+#### LINES
+## See http://matplotlib.org/api/artist_api.html#module-matplotlib.lines for more
+## information on line properties.
+
+#### FONT
+## font properties used by text.Text.  See
+## http://matplotlib.org/api/font_manager_api.html for more
+## information on font properties.
+font.family          : serif
+font.size:    10.0
+
+#### TEXT
+## text properties used by text.Text.  See
+## http://matplotlib.org/api/artist_api.html#module-matplotlib.text for more
+## information on text properties
+
+#### LATEX
+## See http://wiki.scipy.org/Cookbook/Matplotlib/UsingTex
+text.usetex         : True
+text.latex.preamble : \usepackage{amsmath, amssymb, amsfonts, bm}
+
+#### AXES
+## default face and edge color, default tick sizes,
+## default fontsizes for ticklabels, and so on.  See
+## http://matplotlib.org/api/axes_api.html#module-matplotlib.axes
+axes.facecolor:     f8f8f8     # axes background color
+axes.grid:          True    # display grid or not
+axes.grid.axis:     both    # which axis the grid should apply to
+axes.grid.which:    major   # grid lines at {major, minor, both} ticks
+
+axes.spines.left:   True  # display axis spines
+axes.spines.bottom: True
+axes.spines.top:    True
+axes.spines.right:  True
+
+#### TICKS
+## See http://matplotlib.org/api/axis_api.html#matplotlib.axis.Tick
+xtick.top:           False   # draw ticks on the top side
+xtick.bottom:        False   # draw ticks on the bottom side
+ytick.left:          False   # draw ticks on the left side
+ytick.right:         False   # draw ticks on the right side
+
+
+#### GRIDS
+grid.color:     b0b0b0  # grid color
+grid.alpha:     0.5     # transparency
+
+#### LEGEND
+## Dimensions as fraction of font size:
+#legend.borderpad:     0.4  # border whitespace
+legend.labelspacing:  0.33  # the vertical space between the legend entries
+
+
+#### FIGURE
+## See http://matplotlib.org/api/figure_api.html#matplotlib.figure.Figure
+
+
+#### SAVING FIGURES
+savefig.dpi          : figure   ## figure dots per inch or 'figure'
+savefig.format       : pdf      ## png, ps, pdf, svg

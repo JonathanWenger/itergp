@@ -1,0 +1,5 @@
+# Sphinx requirements
+-r sphinx-requirements.txt
+
+# Jupyter notebook requirements
+-r notebook-requirements.txt
