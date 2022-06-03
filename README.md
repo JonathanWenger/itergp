@@ -7,7 +7,7 @@
 
 # IterGP: Computation-Aware Gaussian Process Inference
 
-This repository contains an implementation of the framework described in the paper _Posterior and Computational Uncertainty in Gaussian Processes_.
+This repository contains an implementation of the framework described in the paper [Posterior and Computational Uncertainty in Gaussian Processes](https://arxiv.org/abs/2205.15449).
 
 You can install the Python package via `pip`:
 
