@@ -47,25 +47,27 @@ class DiagonalPlusLowRank(linops.LinearOperator):
         sum_linop = self._diagonal + self._low_rank
 
         # Inverse via matrix inversion lemma
-        small_matrix = (
-            linops.Identity(
-                shape=(low_rank_factor.shape[1], low_rank_factor.shape[1]),
-                dtype=sum_linop.dtype,
-            )
-            + low_rank_factor.T @ self.diag_comp.inv() @ low_rank_factor
-        )
+        small_matrix = linops.Identity(
+            shape=(low_rank_factor.shape[1], low_rank_factor.shape[1]),
+            dtype=sum_linop.dtype,
+        ) + low_rank_factor.T @ (self.diag_comp.inv() @ low_rank_factor)
         small_matrix_cholfac = backend.linalg.cholesky(
             small_matrix.todense(), upper=False
         )
-        diag_plus_low_rank_inverse = (
-            self.diag_comp.inv()
-            - self.diag_comp.inv()
-            @ low_rank_factor
-            @ backend.linalg.solve_cholesky(
-                small_matrix_cholfac,
-                low_rank_factor.T @ self.diag_comp.inv(),
-                lower=True,
+
+        def inv_matmul(X):
+            diag_inv_X = self.diag_comp.inv() @ X
+            return self.diag_comp.inv() @ X - self.diag_comp.inv() @ (
+                low_rank_factor
+                @ backend.linalg.solve_cholesky(
+                    small_matrix_cholfac,
+                    low_rank_factor.T @ diag_inv_X,
+                    lower=True,
+                )
             )
+
+        diag_plus_low_rank_inverse = linops.LinearOperator(
+            shape=self._diagonal.shape, dtype=self._diagonal.dtype, matmul=inv_matmul
         )
 
         super().__init__(
