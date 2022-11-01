@@ -78,9 +78,8 @@ class ConjugateGradientPolicy(policies.LinearSolverPolicy):
             # Conjugacy correction (in exact arithmetic)
             beta = (
                 residual.T
-                @ precond_inv
-                @ residual
-                / (prev_residual.T @ precond_inv @ prev_residual)
+                @ (precond_inv @ residual)
+                / (prev_residual.T @ (precond_inv @ prev_residual))
             )
             return (
                 precond_inv @ residual
