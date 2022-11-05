@@ -1,4 +1,4 @@
-"""IterGP: A Novel Iterative Framework for Gaussian Process Approximation."""
+"""IterGP: Computation-aware Gaussian Process Inference."""
 
 # isort: off
 from . import linops
