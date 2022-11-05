@@ -10,7 +10,7 @@ from probnum import backend, linops, randprocs
 _USE_KEOPS = True
 try:
     import pykeops
-except ImportError, ModuleNotFoundError:
+except (ImportError, ModuleNotFoundError):
     _USE_KEOPS = False
     warnings.warning("KeOps is not installed and currently unavailable for Windows. This may prevent scaling to large datasets.")
 
