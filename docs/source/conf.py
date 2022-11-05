@@ -145,7 +145,7 @@ html_theme = "pydata_sphinx_theme"
 html_title = f"{project} {version} documentation"
 html_context = {
     "AUTHOR": author,
-    "DESCRIPTION": "IterGP: A Unifying Iterative Framework for GP Approximation.",
+    "DESCRIPTION": "IterGP: A Computation-Aware Framework for GP Approximation.",
     "SITEMAP_BASE_URL": "",  # Trailing slash is needed
     "VERSION": version,
 }
