@@ -12,7 +12,7 @@ try:
     import pykeops
 except (ImportError, ModuleNotFoundError):
     _USE_KEOPS = False
-    warnings.warning("KeOps is not installed and currently unavailable for Windows. This may prevent scaling to large datasets.")
+    warnings.warn("KeOps is not installed and currently unavailable for Windows. This may prevent scaling to large datasets.")
 
 class KernelMatrix(linops.LinearOperator):
     r"""Kernel matrix.
