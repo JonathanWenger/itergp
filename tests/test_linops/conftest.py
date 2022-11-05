@@ -4,7 +4,24 @@ from typing import Optional
 from probnum import backend, randprocs
 from probnum.backend.typing import ShapeType
 
+from itergp import kernels
+
 import pytest
+import pytest_cases
+
+
+@pytest_cases.fixture(scope="package")
+@pytest_cases.parametrize("shape", [(), (1,), (10,)], idgen="input_shape{shape}")
+def input_shape(shape: ShapeType) -> ShapeType:
+    """Input dimension of the random process."""
+    return shape
+
+
+@pytest_cases.fixture(scope="package")
+@pytest_cases.parametrize("shape", [()], idgen="output_shape{shape}")
+def output_shape(shape: ShapeType) -> ShapeType:
+    """Output dimension of the random process."""
+    return shape
 
 
 # Kernels
@@ -12,9 +29,9 @@ import pytest
     params=[
         pytest.param(kerndef, id=kerndef[0].__name__)
         for kerndef in [
-            (randprocs.kernels.ExpQuad, {"lengthscale": 1.5}),
-            (randprocs.kernels.Matern, {"lengthscale": 1.0, "nu": 0.5}),
-            (randprocs.kernels.Matern, {"lengthscale": 1.0, "nu": 1.5}),
+            (kernels.ExpQuad, {"lengthscale": 1.5}),
+            (kernels.Matern, {"lengthscale": 1.0, "nu": 0.5}),
+            (kernels.Matern, {"lengthscale": 1.0, "nu": 1.5}),
         ]
     ],
 )
@@ -28,7 +45,6 @@ def kernel(request, input_shape: ShapeType) -> randprocs.kernels.Kernel:
     params=[
         pytest.param(shape, id=f"x0{shape}")
         for shape in [
-            (),
             (1,),
             (2,),
             (10,),
@@ -45,7 +61,6 @@ def x0_batch_shape(request) -> ShapeType:
         pytest.param(shape, id=f"x1{shape}")
         for shape in [
             None,
-            (),
             (1,),
             (3,),
             (10,),
