@@ -1,1 +1,1 @@
-"""Tests for GP approximation methods."""
+"""Tests for linear operators."""
