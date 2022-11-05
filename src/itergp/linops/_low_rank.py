@@ -61,6 +61,7 @@ class LowRankMatrix(linops.LinearOperator):
 
     @property
     def identical_factors(self) -> bool:
+        """Are the two low-rank factors identical?"""
         return self._identical_factors
 
     @property
@@ -73,4 +74,5 @@ class LowRankMatrix(linops.LinearOperator):
         """Second factor."""
         return self._V
 
-    # TODO: Use this property to reduce a sum of low-rank linear operators with identical factors: UU' + uu' = [U u][U u]'
+    # TODO: Use this property to reduce a sum of low-rank linear operators with
+    # identical factors: UU' + uu' = [U u][U u]'

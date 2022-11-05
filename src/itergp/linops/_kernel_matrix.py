@@ -57,14 +57,17 @@ class KernelMatrix(linops.LinearOperator):
 
     @property
     def kernel(self) -> randprocs.kernels.Kernel:
+        """Covariance function of the kernel matrix."""
         return self._kernel
 
     @property
     def x0(self) -> backend.Array:
+        """First input(s)."""
         return self._x0
 
     @property
     def x1(self) -> backend.Array:
+        """Second input(s)."""
         return self._x1
 
     def _matmul(self, x: backend.Array):
@@ -77,7 +80,9 @@ class KernelMatrix(linops.LinearOperator):
                 if self._x1.ndim == 1:
                     x1 = self._x1[:, None]
 
-            return self._kernel._keops_lazy_tensor(x0, x1) @ x
+            return (
+                self._kernel._keops_lazy_tensor(x0, x1) @ x
+            )  # pylint: disable=protected-access
 
         return self.todense() @ x
 
