@@ -12,7 +12,10 @@ try:
     import pykeops
 except (ImportError, ModuleNotFoundError):
     _USE_KEOPS = False
-    warnings.warn("KeOps is not installed and currently unavailable for Windows. This may prevent scaling to large datasets.")
+    warnings.warn(
+        "KeOps is not installed and currently unavailable for Windows. This may prevent scaling to large datasets."
+    )
+
 
 class KernelMatrix(linops.LinearOperator):
     r"""Kernel matrix.
@@ -47,7 +50,6 @@ class KernelMatrix(linops.LinearOperator):
         self._x0 = x0 = backend.asarray(x0)
         self._x1 = x0 if x1 is None else backend.asarray(x1)
         self._use_keops = _USE_KEOPS and (x0.shape[0] >= size_keops)
-            
 
         super().__init__(
             shape=(self._x0.shape[0], self._x1.shape[0]),
