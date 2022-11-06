@@ -12,7 +12,8 @@ class PseudoInput(ProbabilisticLinearSolver):
     Parameters
     ----------
     pseudo_inputs
-        Pseudo inputs, also known as inducing points, at which kernel function actions are centered.
+        Pseudo inputs, also known as inducing points, at which kernel function actions
+        are centered.
     """
 
     def __init__(self, pseudo_inputs: backend.Array):
