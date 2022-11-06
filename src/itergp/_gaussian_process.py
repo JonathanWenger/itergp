@@ -163,10 +163,10 @@ class ConditionalGaussianProcess(GaussianProcess):
         )
 
     @property
-    def numerical_predictive(self) -> GaussianProcess:
-        """Numerical predictive distribution.
+    def computational_predictive(self) -> GaussianProcess:
+        """Computational predictive distribution.
 
-        Returns the Gaussian process quantifying uncertainty induced by the numerical
+        Returns the Gaussian process quantifying computational uncertainty induced by the numerical
         approximation method used to compute the representer weights.
         """
         return GaussianProcess(
@@ -175,7 +175,7 @@ class ConditionalGaussianProcess(GaussianProcess):
                 X=self._Xs[0],
                 representer_weights=self._representer_weights,
             ),
-            cov=ConditionalGaussianProcess.NumericalApproximationKernel(
+            cov=ConditionalGaussianProcess.ComputationalApproximationKernel(
                 input_shape=self._prior.cov.input_shape,
                 output_shape=self._prior.cov.output_shape,
                 k_Xs=self._k_Xs,
@@ -271,8 +271,8 @@ class ConditionalGaussianProcess(GaussianProcess):
                 )[..., 0, 0]
             )  # TODO: replace k_x_Xs with KernelMatrix linear operator
 
-    class NumericalApproximationKernel(randprocs.kernels.Kernel):
-        """Kernel describing numerical uncertainty induced by a GP approximation.
+    class ComputationalApproximationKernel(randprocs.kernels.Kernel):
+        """Kernel describing computational uncertainty induced by a GP approximation.
 
         Parameters
         ----------
@@ -362,7 +362,7 @@ class ConditionalGaussianProcess(GaussianProcess):
         X: backend.Array,
         data: Optional[Tuple[backend.Array, backend.Array]] = None,
         stdevs: Tuple[float, ...] = (2,),
-        numerical_predictive: bool = False,
+        computational_predictive: bool = False,
         samples: int = 0,
         rng_state: RNGState = backend.random.rng_state(0),
         ax: Optional[matplotlib.axis.Axis] = None,
@@ -379,8 +379,8 @@ class ConditionalGaussianProcess(GaussianProcess):
             Number of standard deviations to plot around the mean of the
             Gaussian process. Can be a tuple to plot more than one shaded
             credible region.
-        numerical_predictive
-            Whether to plot the numerical predictive distribution.
+        computational_predictive
+            Whether to plot the computational predictive distribution.
         samples
             Number of samples to plot.
         rng_state
@@ -414,15 +414,15 @@ class ConditionalGaussianProcess(GaussianProcess):
             samples = self.sample(rng_state=rng_state, sample_shape=samples, args=X)
             ax.plot(X, samples.T, lw=0.5, color=color, **kwargs)
 
-        # Plot numerical predictive distribution
-        if numerical_predictive:
+        # Plot computational predictive distribution
+        if computational_predictive:
 
             if X.ndim <= 1:
                 X = backend.sort(X)
 
             mean = self.mean(X)
-            gp_numerical_pred = self.numerical_predictive
-            gp_numerical_std = gp_numerical_pred.std(X)
+            gp_computational_pred = self.computational_predictive
+            gp_computational_std = gp_computational_pred.std(X)
 
             for i in stdevs:
 
@@ -430,7 +430,7 @@ class ConditionalGaussianProcess(GaussianProcess):
                 ax.fill_between(
                     x=X,
                     y1=mean - i * std,
-                    y2=mean - i * gp_numerical_std,
+                    y2=mean - i * gp_computational_std,
                     lw=0.1,
                     alpha=0.4,
                     label=f"GP {i}$\\times$stdev",
@@ -439,7 +439,7 @@ class ConditionalGaussianProcess(GaussianProcess):
                 )
                 ax.fill_between(
                     x=X,
-                    y1=mean + i * gp_numerical_std,
+                    y1=mean + i * gp_computational_std,
                     y2=mean + i * std,
                     lw=0.1,
                     alpha=0.4,
@@ -450,8 +450,8 @@ class ConditionalGaussianProcess(GaussianProcess):
                 # Computational uncertainty
                 ax.fill_between(
                     x=X,
-                    y1=mean - i * gp_numerical_std,
-                    y2=mean + i * gp_numerical_std,
+                    y1=mean - i * gp_computational_std,
+                    y2=mean + i * gp_computational_std,
                     lw=0.0,
                     alpha=0.4,
                     color="C2",
