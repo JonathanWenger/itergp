@@ -10,12 +10,17 @@ from probnum import backend
 from probnum.backend.typing import ArrayLike
 from probnum.randprocs.kernels import ExpQuad, Matern
 from probnum.randprocs.kernels._arithmetic_fallbacks import ScaledKernel
-from pykeops.numpy import LazyTensor, Pm, Vi, Vj
+
+try:
+    from pykeops.numpy import LazyTensor, Pm, Vi, Vj
+except ImportError as e:
+    pass
+
 
 from itergp import linops
 
 
-def linop(
+def kernel_matrix_linop(
     self,
     x0: ArrayLike,
     x1: Optional[ArrayLike] = None,
@@ -97,9 +102,9 @@ def _scaled_keops_lazy_tensor(
     return self._scalar * self._kernel._keops_lazy_tensor(x0=x0, x1=x1)
 
 
-Matern.linop = linop
-ExpQuad.linop = linop
-ScaledKernel.linop = linop
+Matern.linop = kernel_matrix_linop
+ExpQuad.linop = kernel_matrix_linop
+ScaledKernel.linop = kernel_matrix_linop
 Matern._keops_lazy_tensor = _matern_keops_lazy_tensor
 ExpQuad._keops_lazy_tensor = _expquad_keops_lazy_tensor
 ScaledKernel._keops_lazy_tensor = _scaled_keops_lazy_tensor

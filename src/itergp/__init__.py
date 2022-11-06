@@ -1,4 +1,4 @@
-"""IterGP: A Novel Iterative Framework for Gaussian Process Approximation."""
+"""IterGP: Computation-aware Gaussian Process Inference."""
 
 # isort: off
 from . import linops
@@ -6,7 +6,10 @@ from . import kernels
 
 # isort: on
 from . import datasets, methods
-from ._gaussian_process import ConditionalGaussianProcess, GaussianProcess
+from ._gaussian_process import (  # pylint: disable=import-error
+    ConditionalGaussianProcess,
+    GaussianProcess,
+)
 from ._version import version as __version__
 
 # Public classes and functions. Order is reflected in documentation.
