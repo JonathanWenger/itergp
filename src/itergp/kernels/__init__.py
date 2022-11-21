@@ -2,14 +2,14 @@
 from __future__ import annotations
 
 # Public classes and functions. Order is reflected in documentation.
-__all__ = ["ExpQuad", "Matern", "ScaledKernel"]
+__all__ = ["ExpQuad", "Matern", "ScaledKernel", "WhiteNoise", "SumKernel"]
 
 from typing import Optional
 
-from probnum import backend
+from probnum import backend, linops
 from probnum.backend.typing import ArrayLike
-from probnum.randprocs.kernels import ExpQuad, Matern
-from probnum.randprocs.kernels._arithmetic_fallbacks import ScaledKernel
+from probnum.randprocs.kernels import ExpQuad, Matern, WhiteNoise
+from probnum.randprocs.kernels._arithmetic_fallbacks import ScaledKernel, SumKernel
 
 try:
     from pykeops.numpy import LazyTensor, Pm, Vi, Vj
@@ -102,9 +102,20 @@ def _scaled_keops_lazy_tensor(
     return self._scalar * self._kernel._keops_lazy_tensor(x0=x0, x1=x1)
 
 
+def _sum_keops_lazy_tensor(
+    self,
+    x0: ArrayLike,
+    x1: Optional[ArrayLike] = None,
+) -> LazyTensor:
+    return self._kernel._summands[0]._keops_lazy_tensor(
+        x0=x0, x1=x1
+    ) + self._kernel._summands[1]._keops_lazy_tensor(x0=x0, x1=x1)
+
+
 Matern.linop = kernel_matrix_linop
 ExpQuad.linop = kernel_matrix_linop
 ScaledKernel.linop = kernel_matrix_linop
 Matern._keops_lazy_tensor = _matern_keops_lazy_tensor
 ExpQuad._keops_lazy_tensor = _expquad_keops_lazy_tensor
 ScaledKernel._keops_lazy_tensor = _scaled_keops_lazy_tensor
+SumKernel._keops_lazy_tensor = _sum_keops_lazy_tensor

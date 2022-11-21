@@ -90,9 +90,14 @@ class KernelMatrix(linops.LinearOperator):
                 if self._x1.ndim == 1:
                     x1 = self._x1[:, None]
 
-            return (
-                self._kernel._keops_lazy_tensor(x0, x1) @ x
-            )  # pylint: disable=protected-access
+            try:
+                return (
+                    self._kernel._keops_lazy_tensor(x0, x1) @ x
+                )  # pylint: disable=protected-access
+            except AttributeError:
+                raise AttributeError(
+                    f"Kernel {self.kernel} does not have a KeOps implementation. Try raising `size_keops`."
+                )
 
         return self.todense() @ x
 
