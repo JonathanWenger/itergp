@@ -416,7 +416,6 @@ class ConditionalGaussianProcess(GaussianProcess):
 
         # Plot computational predictive distribution
         if computational_predictive:
-
             if X.ndim <= 1:
                 X = backend.sort(X)
 
@@ -425,7 +424,6 @@ class ConditionalGaussianProcess(GaussianProcess):
             gp_computational_std = gp_computational_pred.std(X)
 
             for i in stdevs:
-
                 # Observational uncertainty
                 ax.fill_between(
                     x=X,
@@ -570,6 +568,27 @@ def _plot(
         ax.plot(X, samples.T, lw=0.5, **kwargs)
 
     return ax
+
+
+def _var(self, args: ArrayLike) -> backend.Array:
+    """Compute variance in a matrix-free fashion."""
+    # TODO: This is only a hotfix. Replace dense kernel matrices in Kernel above with linear operators in the future.
+    x = args
+    X = self._Xs[0]
+
+    # Prior variance
+    if isinstance(self._gram_Xs_Xs_inv, linops.Zero):
+        return self._prior.var(x)
+
+    # Compute variance update term in a matrix-free fashion
+    k_x_X = self._prior.cov.linop(x, X)
+    update_term_root = k_x_X @ self._gram_Xs_Xs_inv._summands[1].U
+
+    # Uses the fact that the diagonal of low-rank matrices can be computed efficiently
+    return self._prior.var(x) - backend.sum(update_term_root**2, axis=1)
+
+
+ConditionalGaussianProcess.var = _var
 
 
 def _std(self, args: ArrayLike) -> backend.Array:
