@@ -64,13 +64,45 @@ def kernel_matrix_linop(
     return linops.KernelMatrix(kernel=self, x0=x0, x1=x1)
 
 
+def _squared_euclidean_distances_keops(
+    x0: ArrayLike,
+    x1: Optional[ArrayLike] = None,
+    scale_factors: Optional[ArrayLike] = None,
+) -> LazyTensor:
+    if x1 is None:
+        x1 = x0
+    if len(x0.shape) < 2:
+        x0 = x0.reshape(-1, 1)
+    if len(x1.shape) < 2:
+        x1 = x1.reshape(-1, 1)
+
+    sqdiffs = Vi(x0) - Vj(x1)
+
+    if scale_factors is not None:
+        sqdiffs *= Pm(scale_factors)
+
+    sqdiffs *= sqdiffs
+
+    return sqdiffs.sum()
+
+
+def _euclidean_distances_keops(
+    x0: ArrayLike,
+    x1: Optional[ArrayLike] = None,
+    scale_factors: Optional[ArrayLike] = None,
+) -> LazyTensor:
+    return _squared_euclidean_distances_keops(x0, x1, scale_factors).sqrt()
+
+
 def _expquad_keops_lazy_tensor(
     self,
     x0: ArrayLike,
     x1: Optional[ArrayLike] = None,
 ) -> LazyTensor:
     return (
-        -Pm(backend.asarray([0.5 / self.lengthscale**2])) * Vi(x0).sqdist(Vj(x1))
+        -_squared_euclidean_distances_keops(
+            x0, x1, scale_factors=backend.sqrt(0.5) / self.lengthscale
+        )
     ).exp()
 
 
@@ -79,17 +111,21 @@ def _matern_keops_lazy_tensor(
     x0: ArrayLike,
     x1: Optional[ArrayLike] = None,
 ) -> LazyTensor:
-    sq_distances = Vi(x0).sqdist(Vj(x1))
-    distances = sq_distances.sqrt()
+    scale_factor = backend.sqrt(2 * self.nu) / self.lengthscale
+    scaled_dists = _euclidean_distances_keops(x0, x1, scale_factor)
 
     if self.nu == 0.5:
-        return (-Pm(backend.asarray([1.0 / self.lengthscale])) * distances).exp()
+        return (scaled_dists).exp()
 
     if self.nu == 1.5:
-        scaled_distances = (
-            Pm(backend.asarray([backend.sqrt(3) / self.lengthscale])) * distances
-        )
-        return (1.0 + scaled_distances) * (-scaled_distances).exp()
+        return (1.0 + scaled_dists) * (-scaled_dists).exp()
+    if self.nu == 2.5:
+        return (1.0 + scaled_dists + scaled_dists**2 / 3.0) * (-scaled_dists).exp()
+    if self.nu == 3.5:
+        return (
+            1.0
+            + (1.0 + (2.0 / 5.0 + scaled_dists / 15.0) * scaled_dists) * scaled_dists
+        ) * (-scaled_dists).exp()
     else:
         raise NotImplementedError
 
