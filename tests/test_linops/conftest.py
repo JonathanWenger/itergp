@@ -32,6 +32,8 @@ def output_shape(shape: ShapeType) -> ShapeType:
             (kernels.ExpQuad, {"lengthscale": 1.5}),
             (kernels.Matern, {"lengthscale": 1.0, "nu": 0.5}),
             (kernels.Matern, {"lengthscale": 1.0, "nu": 1.5}),
+            (kernels.Matern, {"lengthscale": 1.0, "nu": 2.5}),
+            (kernels.Matern, {"lengthscale": 1.0, "nu": 3.5}),
         ]
     ],
 )
