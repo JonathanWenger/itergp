@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Optional
 import warnings
 
+import numpy as np
 from probnum import backend, linops, randprocs
 
 _USE_KEOPS = True
@@ -81,6 +82,12 @@ class KernelMatrix(linops.LinearOperator):
         return self._x1
 
     def _matmul(self, x: backend.Array):
+
+        # Naive way to make sparse matmuls more efficient
+        nonzero_row_mask = np.logical_or.reduce(x != 0.0, axis=1)
+        use_sparse_matmul = backend.sum(nonzero_row_mask) < 0.5 * x.shape[0]
+
+        # Check whether we can use KeOps
         if self._use_keops:
             x0 = self._x0
             x1 = self._x1
@@ -91,9 +98,16 @@ class KernelMatrix(linops.LinearOperator):
                     x1 = self._x1[:, None]
 
             try:
-                return (
-                    self._kernel._keops_lazy_tensor(x0, x1) @ x
-                )  # pylint: disable=protected-access
+                if use_sparse_matmul:
+                    return (
+                        self._kernel._keops_lazy_tensor(x0, x1[nonzero_row_mask])
+                        @ x[nonzero_row_mask]
+                    )  # pylint: disable=protected-access
+                else:
+                    return (
+                        self._kernel._keops_lazy_tensor(x0, x1) @ x
+                    )  # pylint: disable=protected-access
+
             except AttributeError:
                 raise AttributeError(
                     f"Kernel {self.kernel} does not have a KeOps implementation. Try raising `size_keops`."
