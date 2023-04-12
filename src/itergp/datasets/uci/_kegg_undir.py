@@ -1,4 +1,4 @@
-"""Protein dataset from the UCI machine learning repository."""
+"""KEGG undirected dataset from the UCI machine learning repository."""
 
 from __future__ import annotations
 
