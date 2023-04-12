@@ -19,8 +19,14 @@ class AdverserialPolicy(policies.LinearSolverPolicy):
 
     Parameters
     ----------
-
+    base_policy
+        Policy which generates :math:`\tilde{s}_i` which then are transformed to be
+        orthogonal to :math:`y`.
     """
+
+    def __init__(self, base_policy: policies.LinearSolverPolicy) -> None:
+        self._base_policy = base_policy
+        super().__init__()
 
     def __call__(
         self,
@@ -46,10 +52,13 @@ class AdverserialPolicy(policies.LinearSolverPolicy):
 
         if solver_state.step < n - 1:
             # Arbitrary linearly independent action sequence
-            action = backend.zeros((n,))
-            action[solver_state.step] = 1.0
+            action = self._base_policy(solver_state=solver_state, rng=rng)
 
             # Enforce orthogonality to observations
             return action - y * (y.T @ action) / (y.T @ y)
 
         return y
+
+    @property
+    def base_policy(self) -> policies.LinearSolverPolicy:
+        return self._base_policy
